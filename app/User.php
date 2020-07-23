@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
@@ -42,5 +44,40 @@ class User extends Authenticatable
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = bcrypt($value);
+    }
+
+    public function register($data)
+    {
+        $validator = Validator::make($data, [
+            'name' => 'required',
+            'email' => 'required|unique:users,email|email',
+            'password' => 'required|min:5',
+        ]);
+
+        if ($validator->fails()) {
+            throw new \Exception($validator->errors()->first(),400);
+        }
+    }
+
+    public function login($data)
+    {
+        $validator = Validator::make($data, [
+            'email' => 'required|email',
+            'password' => 'required|min:5',
+        ]);
+
+        if ($validator->fails()) {
+            throw new \Exception($validator->errors()->first(),400);
+        }
+
+        if(!Auth::attempt([
+            'email' => $data['email'],
+            'password' => $data['password'],
+        ])){
+            throw new \Exception('Invalid Credentials',400);
+        }
+
+        return Auth::user()->createToken('redberry');
+
     }
 }

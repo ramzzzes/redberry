@@ -12,46 +12,21 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request,User $user)
     {
         try{
-            $validator = Validator::make($request->all(), [
-                'name' => 'required',
-                'email' => 'required|unique:users,email|email',
-                'password' => 'required|min:5',
-            ]);
-
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first(),400);
-            }
+            $user->register($request->all());
 
             return response()->json(User::create($request->all()));
-
         }catch (\Exception $e){
             return response()->json($e->getMessage(),$e->getCode());
         }
     }
 
-    public function login(Request $request){
+    public function login(Request $request,User $user){
 
         try{
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
-                'password' => 'required|min:5',
-            ]);
-
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first(),400);
-            }
-
-            if(!Auth::attempt([
-                'email' => $request->post('email'),
-                'password' => $request->post('password'),
-            ])){
-                throw new \Exception('Invalid Credentials',400);
-            }
-
-            $token = Auth::user()->createToken('redberry');
+            $token = $user->login($request->all());
 
             return response()->json([
                 'token' => $token->accessToken,
