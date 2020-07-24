@@ -57,6 +57,11 @@ class User extends Authenticatable
         if ($validator->fails()) {
             throw new \Exception($validator->errors()->first(),400);
         }
+
+        $this->fill($data)->save();
+
+        return $this;
+
     }
 
     public function login($data)
@@ -77,7 +82,7 @@ class User extends Authenticatable
             throw new \Exception('Invalid Credentials',400);
         }
 
-        return Auth::user()->createToken('redberry');
+        return Auth::user()->createToken(env('APP_NAME'));
 
     }
 }
