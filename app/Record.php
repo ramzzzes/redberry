@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Gateway\Nutritionix;
+use App\Jobs\CalculateDailyCaloriesLimit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,15 @@ class Record extends Model
     protected $hidden = [
         'created_at','updated_at'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        self::saved(function ($model){
+            CalculateDailyCaloriesLimit::dispatch($model);
+        });
+    }
 
     public function validate($data)
     {
@@ -63,6 +73,11 @@ class Record extends Model
     public function getCaloriesAttribute($value)
     {
         return (double)($value);
+    }
+
+    public function expectedDailyCalories()
+    {
+        return $this->hasOne(ExpectedDailyCalories::class,'user_id','user_id')->where('date','=',$this->date);
     }
 
 }

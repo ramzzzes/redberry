@@ -20,7 +20,7 @@ class CreateRecordTable extends Migration
             $table->time('time');
             $table->text('text');
             $table->unsignedDouble('calories')->nullable();
-            $table->boolean('total')->default(false);
+            $table->boolean('overdue')->default(false);
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')
