@@ -15,9 +15,8 @@ class UserController extends Controller
     public function register(Request $request,User $user)
     {
         try{
-            $user->register($request->all());
-
-            return response()->json(User::create($request->all()));
+            $response = $user->register($request->all());
+            return response()->json($response);
         }catch (\Exception $e){
             return response()->json($e->getMessage(),$e->getCode());
         }
