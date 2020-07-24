@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Api;
 
 
+use App\ExpectedDailyCalories;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -32,6 +33,16 @@ class UserController extends Controller
                 'expires' => $token->token->expires_at,
             ]);
 
+        }catch (\Exception $e){
+            return response()->json($e->getMessage(),$e->getCode());
+        }
+    }
+
+    public function expectedDailyCalories(Request $request,ExpectedDailyCalories $calories)
+    {
+        try{
+            $response = $calories->create($request->all());
+            return response()->json($response);
         }catch (\Exception $e){
             return response()->json($e->getMessage(),$e->getCode());
         }

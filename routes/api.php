@@ -22,6 +22,7 @@ Route::group([
     'middleware' => 'auth:api',
 ], function () {
     Route::resource('/record', 'Api\RecordController');
+    Route::post('/expected-daily-calories', 'Api\UserController@expectedDailyCalories');
 });
 
 
