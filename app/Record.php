@@ -23,6 +23,23 @@ class Record extends Model
         'created_at','updated_at'
     ];
 
+    protected $filters = [];
+
+    protected $availableRows = [
+        'date',
+        'time',
+        'text',
+        'calories',
+        'overdue',
+    ];
+
+    protected $availableFilters = [
+        'eq' => '=',
+        'nq' => '!=',
+        'gt' => '>',
+        'lt' => '<',
+    ];
+
     public static function boot()
     {
         parent::boot();
@@ -44,6 +61,31 @@ class Record extends Model
         if ($validator->fails()) {
             throw new \Exception($validator->errors()->first(),400);
         }
+    }
+
+    public function fetch($limit,$filters)
+    {
+        $query = self::query();
+
+        foreach ($filters as $filter) {
+
+            if(!in_array($filter['row'],$this->availableRows)){
+                throw new \Exception('Invalid row  : '.$filter['row'],400);
+            }
+
+            if(!isset($this->availableFilters[$filter['operator']])){
+               throw new \Exception('Invalid filter operator : '.$filter['operator'],400);
+           }
+
+           $query->where(
+               $filter['row'],
+               $this->availableFilters[$filter['operator']],
+               $filter['value']
+           );
+
+        }
+
+        return $query->orderBy('updated_at','desc')->paginate($limit);
     }
 
 

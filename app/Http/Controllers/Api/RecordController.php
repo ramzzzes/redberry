@@ -10,10 +10,17 @@ use Illuminate\Http\Request;
 
 class RecordController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request,Record $record)
     {
-        $record = Record::orderBy('created_at','desc')->paginate($request->post('limit',10));
-        return response()->json($record);
+        try{
+            $record = $record->fetch(
+                $request->get('limit',10),
+                $request->get('filters',[])
+            );
+            return response()->json($record);
+        }catch (\Exception $e){
+            return response()->json($e->getMessage(),$e->getCode());
+        }
     }
 
 
